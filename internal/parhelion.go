@@ -1,10 +1,16 @@
 package internal
 
 import (
+	"sync"
+
 	parhelion "github.com/parheliondb/ParhelionDB"
 )
 
-type parhelionDBInternal struct{}
+type parhelionDBInternal struct {
+	DBDirectory parhelion.DBDirectory
+	Options     parhelion.ParhelionDBOptions
+	WriteLock   sync.Mutex
+}
 
 type ParhelionDBInternal interface {
 	Get(key []byte, attemptNumber int) ([]byte, error)
@@ -18,10 +24,20 @@ type ParhelionDBInternal interface {
 }
 
 func NewParhelionDBInternal(dirName string, options parhelion.ParhelionDBOptions) (ParhelionDBInternal, error) {
-	return &parhelionDBInternal{}, nil
+	dbDirectory, err := parhelion.NewDBDirectory(dirName)
+	if err != nil {
+		return nil, err
+	}
+
+	return &parhelionDBInternal{
+		DBDirectory: dbDirectory,
+		Options:     options,
+		WriteLock:   *new(sync.Mutex),
+	}, nil
 }
 
 func (p *parhelionDBInternal) Get(key []byte, attemptNumber int) ([]byte, error) {
+
 	return nil, nil
 }
 

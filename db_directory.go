@@ -1,6 +1,8 @@
 package parhelion
 
-import "github.com/parheliondb/ParhelionDB/util"
+import (
+	"github.com/parheliondb/ParhelionDB/util"
+)
 
 type dbDirectory struct {
 	Path string
