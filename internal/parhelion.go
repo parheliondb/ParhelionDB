@@ -6,13 +6,13 @@ import (
 	parhelion "github.com/parheliondb/ParhelionDB"
 )
 
-type parhelionDBInternal struct {
+type parhelionDB struct {
 	DBDirectory parhelion.DBDirectory
 	Options     parhelion.ParhelionDBOptions
 	WriteLock   sync.Mutex
 }
 
-type ParhelionDBInternal interface {
+type ParhelionDB interface {
 	Get(key []byte, attemptNumber int) ([]byte, error)
 	Put(key []byte, value []byte) bool
 	Delete(key []byte) error
@@ -23,48 +23,48 @@ type ParhelionDBInternal interface {
 	ResumeCompaction() error
 }
 
-func NewParhelionDBInternal(dirName string, options parhelion.ParhelionDBOptions) (ParhelionDBInternal, error) {
+func NewParhelionDB(dirName string, options parhelion.ParhelionDBOptions) (ParhelionDB, error) {
 	dbDirectory, err := parhelion.NewDBDirectory(dirName)
 	if err != nil {
 		return nil, err
 	}
 
-	return &parhelionDBInternal{
+	return &parhelionDB{
 		DBDirectory: dbDirectory,
 		Options:     options,
 		WriteLock:   *new(sync.Mutex),
 	}, nil
 }
 
-func (p *parhelionDBInternal) Get(key []byte, attemptNumber int) ([]byte, error) {
+func (p *parhelionDB) Get(key []byte, attemptNumber int) ([]byte, error) {
 
 	return nil, nil
 }
 
-func (p *parhelionDBInternal) Put(key []byte, value []byte) bool {
+func (p *parhelionDB) Put(key []byte, value []byte) bool {
 	return false
 }
 
-func (p *parhelionDBInternal) Delete(key []byte) error {
+func (p *parhelionDB) Delete(key []byte) error {
 	return nil
 }
 
-func (p *parhelionDBInternal) Close() error {
+func (p *parhelionDB) Close() error {
 	return nil
 }
 
-func (p *parhelionDBInternal) Size() int64 {
+func (p *parhelionDB) Size() int64 {
 	return 0
 }
 
-func (p *parhelionDBInternal) SetIOErrorFlag() error {
+func (p *parhelionDB) SetIOErrorFlag() error {
 	return nil
 }
 
-func (p *parhelionDBInternal) PauseCompaction() error {
+func (p *parhelionDB) PauseCompaction() error {
 	return nil
 }
 
-func (p *parhelionDBInternal) ResumeCompaction() error {
+func (p *parhelionDB) ResumeCompaction() error {
 	return nil
 }
