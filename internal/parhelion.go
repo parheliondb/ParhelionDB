@@ -3,13 +3,15 @@ package internal
 import (
 	"sync"
 
+	"github.com/juju/fslock"
 	parhelion "github.com/parheliondb/ParhelionDB"
 )
 
 type parhelionDB struct {
 	DBDirectory parhelion.DBDirectory
 	Options     parhelion.ParhelionDBOptions
-	WriteLock   sync.Mutex
+	FileLock    *fslock.Lock
+	WriteLock   *sync.Mutex
 }
 
 type ParhelionDB interface {
@@ -29,10 +31,17 @@ func NewParhelionDB(dirName string, options parhelion.ParhelionDBOptions) (Parhe
 		return nil, err
 	}
 
+	fileLock := fslock.New(dbDirectory.GetPath())
+	err = fileLock.TryLock()
+	if err != nil {
+		return nil, err
+	}
+
 	return &parhelionDB{
 		DBDirectory: dbDirectory,
 		Options:     options,
-		WriteLock:   *new(sync.Mutex),
+		FileLock:    fileLock,
+		WriteLock:   new(sync.Mutex),
 	}, nil
 }
 
@@ -50,6 +59,10 @@ func (p *parhelionDB) Delete(key []byte) error {
 }
 
 func (p *parhelionDB) Close() error {
+	if p.FileLock != nil {
+		p.FileLock.Unlock()
+	}
+
 	return nil
 }
 
