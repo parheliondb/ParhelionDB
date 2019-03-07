@@ -1,5 +1,7 @@
 package util
 
+// TODO everyone
+
 import (
 	"fmt"
 	"os"
