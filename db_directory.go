@@ -1,20 +1,22 @@
 package parhelion
 
 import (
+	"io/ioutil"
+	"regexp"
+
 	"github.com/parheliondb/ParhelionDB/util"
 )
 
 type dbDirectory struct {
-	Path string
+	path string
 }
 
 type DBDirectory interface {
-	Close() error
 	GetPath() string
-	// ListDataFiles() []string
-	// ListIndexFiles() []int
-	// ListTombstoneFiles() []string
-	SyncMetaData() error
+	ListDataFiles() ([]string, error)
+	ListIndexFiles() ([]string, error)
+	ListTombstoneFiles() ([]string, error)
+	SyncMetadata() error
 }
 
 func NewDBDirectory(path string) (DBDirectory, error) {
@@ -24,30 +26,43 @@ func NewDBDirectory(path string) (DBDirectory, error) {
 	}
 
 	return &dbDirectory{
-		Path: path,
+		path: path,
 	}, nil
 }
 
-func (d *dbDirectory) Close() error {
-	return nil
-}
-
 func (d *dbDirectory) GetPath() string {
-	return d.Path
+	return d.path
 }
 
-// func (d *dbDirectory) ListDataFiles() []string {
-//
-// }
-//
-// func (d *dbDirectory) ListIndexFiles() []int {
-//
-// }
-//
-// func (d *dbDirectory) ListTombstoneFiles() []string {
-//
-// }
+func (d *dbDirectory) ListDataFiles() ([]string, error) {
+	return d.findFilesByRegexpPattern(DataFilePattern)
+}
 
-func (d *dbDirectory) SyncMetaData() error {
+func (d *dbDirectory) ListIndexFiles() ([]string, error) {
+	return d.findFilesByRegexpPattern(IndexFilePattern)
+}
+
+func (d *dbDirectory) ListTombstoneFiles() ([]string, error) {
+	return d.findFilesByRegexpPattern(TombstoneFilePattern)
+}
+
+func (d *dbDirectory) findFilesByRegexpPattern(re *regexp.Regexp) ([]string, error) {
+	files, err := ioutil.ReadDir(d.path)
+	if err != nil {
+		return nil, err
+	}
+
+	filtered := make([]string, 0, len(files))
+	for _, file := range files {
+		if re.Match([]byte(file.Name())) {
+			filtered = append(filtered, file.Name())
+		}
+	}
+
+	return filtered, nil
+}
+
+func (d *dbDirectory) SyncMetadata() error {
+	// TODO: should be considered how to achieve ReadOnlyFileChannel in golang
 	return nil
 }

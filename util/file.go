@@ -7,10 +7,14 @@ import (
 
 func CreateDirectoryIfNotExists(path string) error {
 	fi, err := os.Stat(path)
-
-	if os.IsNotExist(err) {
+	if err != nil {
+		if !os.IsNotExist(err) {
+			return err
+		}
 		return os.Mkdir(path, 0660)
-	} else if !fi.Mode().IsDir() {
+	}
+
+	if !fi.Mode().IsDir() {
 		return fmt.Errorf("%s is not a directory", path)
 	}
 
