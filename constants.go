@@ -1,6 +1,8 @@
 package parhelion
 
-import "regexp"
+import (
+	"regexp"
+)
 
 var (
 	DataFileName          = ".data"

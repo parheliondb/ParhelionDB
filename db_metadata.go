@@ -8,7 +8,7 @@ import (
 )
 
 type DBMetadata struct {
-	CheckSum       uint32
+	Checksum       uint32
 	Version        uint8
 	Open           bool
 	SequenceNumber uint64
@@ -75,6 +75,6 @@ func (l *dbMetadataLoader) Store(m DBMetadata) error {
 	return gob.NewEncoder(f).Encode(m)
 }
 
-func computeCheckSum(bs []byte) uint32 {
+func computeChecksum(bs []byte) uint32 {
 	return crc32.ChecksumIEEE(bs)
 }
