@@ -3,6 +3,8 @@ package parhelion
 import (
 	"bytes"
 	"unsafe"
+
+	"github.com/parheliondb/ParhelionDB/memory"
 )
 
 const (
@@ -37,6 +39,7 @@ type RecordHeader interface {
 	Serialize() (*bytes.Buffer, error)
 	KeySize() uint8
 	ValueSize() uint32
+	SequenceNumber() int64
 	setChecksum(checksum uint32)
 }
 
@@ -129,19 +132,27 @@ func (rh *recordHeader) ValueSize() uint32 {
 	return rh.valueSize
 }
 
+func (rh *recordHeader) SequenceNumber() int64 {
+	return rh.sequenceNumber
+}
+
 func (rh *recordHeader) setChecksum(checksum uint32) {
 	rh.checksum = checksum
 }
 
 type record struct {
-	key   []byte
-	value []byte
-	// metadata InMemoryIndexMetadata
-	header RecordHeader
+	key      []byte
+	value    []byte
+	metadata memory.Metadata
+	header   RecordHeader
 }
 
 type Record interface {
 	Serialize() (*bytes.Buffer, error)
+	SetHeader(RecordHeader)
+	SetMetadata(memory.Metadata)
+	Key() []byte
+	Value() []byte
 }
 
 func NewRecord(key, value []byte) Record {
@@ -194,6 +205,22 @@ func (r *record) Serialize() (*bytes.Buffer, error) {
 	}
 
 	return buf, nil
+}
+
+func (r *record) SetHeader(h RecordHeader) {
+	r.header = h
+}
+
+func (r *record) SetMetadata(m memory.Metadata) {
+	r.metadata = m
+}
+
+func (r *record) Key() []byte {
+	return r.key
+}
+
+func (r *record) Value() []byte {
+	return r.value
 }
 
 func (r *record) computeChecksum() (uint32, error) {

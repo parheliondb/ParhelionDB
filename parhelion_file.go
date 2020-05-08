@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+
+	"github.com/parheliondb/ParhelionDB/memory"
 )
 
 type parhelionDBFile struct {
@@ -90,7 +92,9 @@ func (pf *parhelionDBFile) readRecord(offset int64) (Record, error) {
 		return nil, err
 	}
 
-	// TODO: setRecordMetadata
+	r.SetHeader(rh)
+	valueOffset := uint64(offset) + uint64(rh.KeySize())
+	r.SetMetadata(memory.NewMetadata(pf.fileID, valueOffset, rh.ValueSize(), rh.SequenceNumber()))
 
 	return r, nil
 }
