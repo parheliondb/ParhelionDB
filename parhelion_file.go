@@ -98,3 +98,9 @@ func (pf *parhelionDBFile) readRecord(offset int64) (Record, error) {
 
 	return r, nil
 }
+
+func (pf *parhelionDBFile) writeRecord(rec Record) (memory.Metadata, error) {
+	// writeToChannel
+
+	return nil, nil
+}
